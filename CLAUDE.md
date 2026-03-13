@@ -43,3 +43,13 @@ Four source modules, all at the project root:
 - PRs are created and merged by humans
 - If Copilot's automated review leaves comments, Claude fixes them and pushes to the same feature branch
 - Thread resolution and final merge are done by humans
+
+### Release手順
+1. `manifest.json` と `versions.json` のバージョン番号を更新してmainにマージ
+2. タグを打ってpushするとrelease.ymlが自動起動し、GitHub Releasesに成果物が公開される：
+   ```bash
+   git tag v<version>
+   git push origin v<version>
+   ```
+
+> リリースワークフローのトリガーはtagのpushのみ。mainへのpushだけではリリースされない。

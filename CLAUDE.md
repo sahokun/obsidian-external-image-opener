@@ -44,12 +44,28 @@ Four source modules, all at the project root:
 - If Copilot's automated review leaves comments, Claude fixes them and pushes to the same feature branch
 - Thread resolution and final merge are done by humans
 
-### Release手順
-1. `manifest.json` と `versions.json` のバージョン番号を更新してmainにマージ
-2. タグを打ってpushするとrelease.ymlが自動起動し、GitHub Releasesに成果物が公開される：
+### Release Procedure
+
+#### When to bump the version
+
+| Change type | Version bump |
+|---|---|
+| Changes to plugin source files (`*.ts`, etc.) | **Required** |
+| CI workflow changes only (`.github/workflows/`) | Not required |
+| Documentation changes only (`README.md`, `CLAUDE.md`) | Not required |
+
+#### Steps
+
+1. Bump version in one command (`manifest.json`, `versions.json`, `package.json`, `package-lock.json` are all updated):
+   ```bash
+   npm run bump -- <new-version>
+   # Example: npm run bump -- 1.0.1
+   ```
+2. Commit and merge into main
+3. Push a tag to trigger release.yml, which publishes artifacts to GitHub Releases:
    ```bash
    git tag v<version>
    git push origin v<version>
    ```
 
-> リリースワークフローのトリガーはtagのpushのみ。mainへのpushだけではリリースされない。
+> The release workflow is triggered only by tag pushes. Pushing to main alone does not trigger a release.

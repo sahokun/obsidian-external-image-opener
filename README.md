@@ -15,23 +15,8 @@ An [Obsidian](https://obsidian.md/) plugin that opens images in external program
 
 ## Installation
 
-### From Obsidian Community Plugins
-
-1. Open **Settings** > **Community plugins**
-2. Click **Browse** and search for "Open Image Externally"
-3. Click **Install**, then **Enable**
-
-### Using BRAT
-
-1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
-2. In BRAT settings, click **Add Beta plugin**
-3. Enter `sahokun/open-image-externally`
-4. Enable the plugin in **Settings** > **Community plugins**
-
-### Manual Installation
-
 1. Download `main.js` and `manifest.json` from the
-   [latest release](https://github.com/sahokun/open-image-externally/releases/latest)
+   [latest release](https://github.com/sahokun/obsidian-external-image-opener/releases/latest)
 2. Create a folder: `<vault>/.obsidian/plugins/open-image-externally/`
 3. Copy the downloaded files into that folder
 4. Restart Obsidian and enable the plugin in **Settings** > **Community plugins**

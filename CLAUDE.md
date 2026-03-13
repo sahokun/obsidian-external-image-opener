@@ -6,10 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Think in English, respond in Japanese.
 
-## Project Overview
-
-Obsidian plugin that opens images in external programs from notes. Desktop only. Supports WikiLink (`![[image.png]]`) and Markdown (`![alt](url)`) image references with multiple interaction methods (command palette, context menu, Ctrl+Click in reading mode, ribbon icon).
-
 ## Build Commands
 
 ```bash
@@ -36,3 +32,14 @@ Four source modules, all at the project root:
 - **Path resolution in reading mode**: Images use `app://` URLs that must be decoded and matched against vault files to get absolute paths.
 - **Error handling**: All errors surface as Obsidian `Notice` dialogs rather than thrown exceptions.
 - **Security**: Uses `execFile()` (not `exec()`) to prevent command injection when launching external programs.
+
+## Git Workflow
+
+- Feature branches use the `feature/<name>` format, created from **main**
+- Direct push and force push to main are prohibited
+- Claude's scope of work is limited to pushing to feature branches
+
+### PR Flow (handled by humans)
+- PRs are created and merged by humans
+- If Copilot's automated review leaves comments, Claude fixes them and pushes to the same feature branch
+- Thread resolution and final merge are done by humans

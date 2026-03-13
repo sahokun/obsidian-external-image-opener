@@ -1,6 +1,6 @@
 {
   "name": "obsidian-external-image-opener",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "sahokun",
   "description": "Open images in external programs with keyboard shortcuts or button clicks",
   "main": "dist/main.js",

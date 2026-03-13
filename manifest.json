@@ -1,7 +1,7 @@
 {
   "id": "open-image-externally",
   "name": "Open Image Externally",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minAppVersion": "1.8.7",
   "description": "Open images in external programs with keyboard shortcuts or button clicks",
   "author": "sahokun",

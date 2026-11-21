@@ -1,67 +1,67 @@
 # External Image Opener
 
-<!-- このファイルは AI エージェント（Claude Code・Codex など）と人の両方に向けた、このリポジトリの作業規則。
-     「プロジェクト固有」の節はプロジェクトごとに書き換え、「共通の規則」の節は sahokun の全リポジトリで共通に保つ。 -->
+<!-- Working rules for this repository, for both AI agents (Claude Code, Codex, etc.) and people.
+     Rewrite the "Project-specific" section per project; keep the "Common rules" section identical across all of sahokun's repositories. -->
 
-## プロジェクト固有
+## Project-specific
 
-### 概要
+### Overview
 
-Obsidian のプラグイン。ノートの画像を、キーボードショートカットやボタンで外部のプログラムを使って開く。
-デスクトップとモバイルの Obsidian 利用者向けに、GitHub Releases で配布する。
+An Obsidian plugin that opens images in notes with external programs, via keyboard shortcuts or button clicks.
+It is distributed through GitHub Releases for Obsidian users on desktop and mobile.
 
-### 技術スタックと構成
+### Tech stack and layout
 
-- TypeScript（strict）を esbuild で 1 つの `main.js` にまとめる。Obsidian API と CodeMirror のモジュールは external にして含めない。
-- ソースはすべてリポジトリの直下にある。
-  - `main.ts`: プラグインの入口。`Plugin` を継承し、コマンド・エディタのコンテキストメニュー・閲覧モードのクリック・リボンのアイコンを登録して、他のモジュールを呼ぶ。
-  - `image-path-extractor.ts`: カーソルの位置または選択範囲から、正規表現で画像の参照を見つける。対応する拡張子（PNG・JPG・GIF・WebP・SVG・BMP・TIFF・ICO・AVIF）で絞る。
-  - `image-opener.ts`: Vault 内の相対パスを `metadataCache.getFirstLinkpathDest()` で絶対パスにし、指定のプログラムなら `child_process.execFile()`、未指定なら Obsidian の既定のアプリで開く。HTTP/HTTPS の URL は別に扱う。
-  - `i18n.ts`: 英語と日本語の簡易な翻訳。`{path}`・`{msg}` の変数を埋め込む。言語は Obsidian の設定から決める。
-  - `settings.ts`: 設定は `customProgramPath` の 1 つだけ（空文字ならシステムの既定）。
-- 実装の要点:
-  - 閲覧モードの画像は `app://` の URL なので、デコードして Vault のファイルと照合し、絶対パスを得る。
-  - エラーは例外として投げず、Obsidian の `Notice` で利用者に見せる。
-  - 外部のプログラムは `exec()` ではなく `execFile()` で起動する。コマンドインジェクションを防ぐため。
+- TypeScript (strict), bundled by esbuild into a single `main.js`. The Obsidian API and CodeMirror modules are externals and are not bundled.
+- All source modules live at the repository root:
+  - `main.ts`: plugin entry point. Extends `Plugin`, registers commands, the editor context menu, the reading-mode click handler, and the ribbon icon, and calls the other modules.
+  - `image-path-extractor.ts`: regex-based detection of image references at the cursor or in the selection, validated against supported extensions (PNG, JPG, GIF, WebP, SVG, BMP, TIFF, ICO, AVIF).
+  - `image-opener.ts`: resolves vault-relative paths to absolute paths with `metadataCache.getFirstLinkpathDest()`, opens images with `child_process.execFile()` for a custom program or falls back to Obsidian's default app opener, and handles HTTP/HTTPS URLs separately.
+  - `i18n.ts`: simple English/Japanese translations with `{path}` and `{msg}` interpolation. The language follows Obsidian's settings.
+  - `settings.ts`: a single setting, `customProgramPath` (empty string means the system default).
+- Key patterns:
+  - Images in reading mode use `app://` URLs, which are decoded and matched against vault files to get absolute paths.
+  - Errors surface as Obsidian `Notice` dialogs instead of thrown exceptions.
+  - External programs are launched with `execFile()`, not `exec()`, to prevent command injection.
 
-### 確認の手順
+### Verification
 
 ```bash
 npm ci
-npm run build    # tsc の型検査と esbuild の本番ビルド
+npm run build    # tsc type check + esbuild production bundle
 ```
 
-- テストと lint は無い。TypeScript の strict（`noImplicitAny`・`strictNullChecks`・`noUnusedLocals`）で検査する。
-- 開発中は `npm run dev` で、変更を監視してビルドする。
+- There is no test suite or linter. TypeScript strict mode (`noImplicitAny`, `strictNullChecks`, `noUnusedLocals`) provides compile-time validation.
+- `npm run dev` rebuilds on file changes during development.
 
-### リリース
+### Releases
 
-- プラグインのソース（`*.ts` など）を変えたら、バージョンを上げる。ワークフローや文書だけの変更では上げない。
-- 手順:
-  1. `npm run bump -- <新しいバージョン>` で、`manifest.json`・`versions.json`・`package.json`・`package-lock.json` をまとめて更新し、PR で main に取り込む。
-  2. `git tag v<バージョン>` と `git push origin v<バージョン>` でタグを push する。`release.yml` が GitHub Releases に成果物を公開する（main への push だけではリリースされない）。
+- Bump the version when plugin source files (`*.ts`, etc.) change. Workflow-only or documentation-only changes do not need a bump.
+- Steps:
+  1. Run `npm run bump -- <new-version>` to update `manifest.json`, `versions.json`, `package.json`, and `package-lock.json` together, and merge the change into main through a PR.
+  2. Push a tag with `git tag v<version>` and `git push origin v<version>`. `release.yml` publishes the artifacts to GitHub Releases (pushing to main alone does not release).
 
-## 共通の規則
+## Common rules
 
-### ブランチと PR
+### Branches and PRs
 
 <!-- branch-model:begin -->
-- 既定のブランチは `main`。作業はブランチを切り、`main` への PR にする。
-- PR は squash merge で取り込む。main の履歴には PR のタイトルだけが 1 コミットとして残る。
+- The default branch is `main`. Work on a branch and open a PR into `main`.
+- PRs are squash-merged. Each PR leaves a single commit on main, titled with the PR title only.
 <!-- branch-model:end -->
-- PR のタイトルは Conventional Commits（`feat: ...`・`fix: ...` など）で、変更の内容が 1 行で分かるように書く。
-- PR がマージされたら、作業ブランチは自動で削除される。
+- Write PR titles in Conventional Commits form (`feat: ...`, `fix: ...`, etc.) so the change is clear from one line.
+- Merged branches are deleted automatically.
 
-### 履歴と公開物に書かないもの
+### Never put these in history or anything published
 
-- メールアドレス・トークン・パスワード・個人の環境の情報・AI エージェントのセッションへのリンクを、コミット・PR・Issue・コメントに書かない。
-  - 作業ブランチのコミットと PR は、マージ後も GitHub に残り続け、所有者でも消せない。main の履歴も書き換えには強制 push とサポートへの依頼が要る。PR の本文だけは後から編集で直せる。
-- コミットの作成者のメールアドレスは、GitHub の noreply アドレス（`<ID>+<ユーザー名>@users.noreply.github.com`）を使う。
-- `.env`・鍵ファイル・ローカル設定（`.claude/settings.local.json` など）はコミットしない。
+- Do not write email addresses, tokens, passwords, details of a personal environment, or links to AI agent sessions in commits, PRs, issues, or comments.
+  - Work-branch commits and PRs stay on GitHub after merging, and even the owner cannot delete them. Rewriting main's history needs a force push and a request to GitHub Support. Only PR descriptions can be fixed later by editing.
+- Commit with your GitHub noreply address (`<ID>+<username>@users.noreply.github.com`) as the author email.
+- Do not commit `.env`, key files, or local settings (`.claude/settings.local.json`, etc.).
 
-### 依存関係
+### Dependencies
 
-- 追加・更新する依存は、公開から 7 日以上たったバージョンに限る。公開直後に乗っ取り・差し替えが見つかる事例が多いため。
-  - Dependabot のバージョン更新は `cooldown` で 7 日待つ。npm は `.npmrc` の `min-release-age=7` で手作業の更新にも同じ制限を掛ける。
-- GitHub Actions のアクションは、フル SHA（40 桁）で固定し、行末にバージョンをコメントで残す（例: `actions/checkout@<SHA> # v7.0.1`）。タグは差し替えられるため。
-- Dependabot の PR は、更新を知らせる合図として扱う。CI が通ることと、メジャー更新では変更点を確かめてから取り込む。
+- Only add or update to versions published at least 7 days ago. Hijacked or swapped releases are often discovered shortly after publication.
+  - Dependabot version updates wait 7 days via `cooldown`. For npm, `min-release-age=7` in `.npmrc` applies the same limit to manual updates.
+- Pin GitHub Actions to a full 40-character commit SHA and keep the version as a trailing comment (e.g. `actions/checkout@<SHA> # v7.0.1`). Tags can be moved.
+- Treat Dependabot PRs as a signal that updates exist. Merge them once CI passes, and for major updates, after reviewing the changes.
